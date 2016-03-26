@@ -19,8 +19,14 @@ class Solution {
     
     //Fastest
     func twoSumAlt(nums: [Int], _ target: Int) -> [Int] {
+//: >Create a dictionary where
+//: > * **Key** = Difference between target value and current array element
+//: > * **Value** = Index of current array element
         var pot = [Int : Int]()
         var solution: [Int] = [0, 0]
+//: > For each element in array,
+//: > if it exists in the dictionary, we have found one index.
+//: > Otherwise, add the difference and index to dictionary
         for (idx, element) in nums.enumerate() {
             if pot[element] != nil {
                 solution = [pot[element]!, idx]
