@@ -61,7 +61,7 @@ class Solution {
     }
 }
 
-
+//: ### Put the following in a new linkedList Class.
 let a = ListNode(1)
 a.next =  ListNode(2)
 a.next?.next = ListNode(3)
