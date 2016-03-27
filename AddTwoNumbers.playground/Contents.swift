@@ -22,6 +22,41 @@
 
 class Solution {
     func addTwoNumbers(l1: ListNode?, _ l2: ListNode?) -> ListNode? {
-        return ListNode(0)
+        var x = l1
+        var y = l2
+        
+        var sum: ListNode?
+        var head: ListNode?
+        
+        var carry = 0
+        while x != nil && y != nil {
+            let addition = x!.val + y!.val
+            let value = addition > 9 ? addition % 10 : addition
+            
+            if  sum != nil {
+                sum?.next = ListNode(value)
+                sum = sum?.next
+            } else {
+                sum = ListNode(value)
+                head = sum
+            }
+            
+            x = x?.next
+            y = y?.next
+        }
+        return head
     }
 }
+
+
+let a = ListNode(1)
+a.next =  ListNode(2)
+a.next?.next = ListNode(3)
+
+let b = ListNode(4)
+b.next = ListNode(5)
+b.next?.next = ListNode(6)
+
+let sol = Solution()
+sol.addTwoNumbers(a, b)
+
