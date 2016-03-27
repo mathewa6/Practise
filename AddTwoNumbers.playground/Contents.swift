@@ -38,8 +38,9 @@ class Solution {
         
         var carry = 0
         while x != nil && y != nil {
-            let addition = x!.val + y!.val
+            let addition = x!.val + y!.val + carry
             let value = addition > 9 ? addition % 10 : addition
+            carry = addition > 9 ? 1 : 0
             
             if  sum != nil {
                 sum?.next = ListNode(value)
@@ -51,6 +52,10 @@ class Solution {
             
             x = x?.next
             y = y?.next
+        }
+        
+        if carry > 0 {
+            sum?.next = ListNode(carry)
         }
         return head
     }
