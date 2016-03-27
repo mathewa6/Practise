@@ -10,13 +10,21 @@
  * }
  */
 
- public class ListNode {
+public class ListNode: CustomStringConvertible {
     public var val: Int
     public var next: ListNode?
     
     public init(_ val: Int) {
         self.val = val
         self.next = nil
+    }
+    
+    public var description: String {
+        if self.next != nil {
+            return "\(self.val) > \(self.next!.val) "
+        }
+        
+        return "\(self.val)"
     }
 }
 
@@ -58,5 +66,12 @@ b.next = ListNode(5)
 b.next?.next = ListNode(6)
 
 let sol = Solution()
-sol.addTwoNumbers(a, b)
+var ans = sol.addTwoNumbers(a, b)
 
+var stringVal = ""
+while ans != nil {
+    stringVal += "\(ans!.val)"
+    ans = ans?.next
+}
+
+stringVal
