@@ -55,20 +55,39 @@ class Solution {
         }
         
         if carry > 0 {
-            sum?.next = ListNode(carry)
+//            If there is a carry here it has the potential to chain down the list.
+            if x == nil && y == nil {
+                sum?.next = ListNode(carry)
+            } else if x != nil {
+                sum?.next = x!
+            } else if y != nil {
+                sum?.next = y!
+            }
+            sum?.next?.val += carry
+        } else {
+            if x != nil {
+                sum?.next = x!
+            } else if y != nil {
+                sum?.next = y!
+            }
         }
+        
+        
+        
         return head
     }
 }
 
 //: ### Put the following in a new linkedList Class.
 let a = ListNode(1)
-a.next =  ListNode(2)
-a.next?.next = ListNode(3)
+//a.next =  ListNode(9)
+//a.next?.next = ListNode(3)
+//a.next?.next?.next = ListNode(8)
 
-let b = ListNode(4)
-b.next = ListNode(5)
-b.next?.next = ListNode(6)
+
+let b = ListNode(9)
+b.next = ListNode(9)
+//b.next?.next = ListNode(9)
 
 let sol = Solution()
 var ans = sol.addTwoNumbers(a, b)
