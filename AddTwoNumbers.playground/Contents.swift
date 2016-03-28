@@ -36,17 +36,24 @@ class Solution {
         var sum: ListNode?
         var head: ListNode?
         
+        func checkAddition(x: Int, y: Int, carry: Int) -> (Int, Int) {
+            let addition = x + y + carry
+            let value = addition > 9 ? addition % 10 : addition
+            let returnCarry = addition > 9 ? 1 : 0
+            
+            return (value, returnCarry)
+        }
+        
         var carry = 0
         while x != nil && y != nil {
-            let addition = x!.val + y!.val + carry
-            let value = addition > 9 ? addition % 10 : addition
-            carry = addition > 9 ? 1 : 0
+            let addition = checkAddition(x!.val, y: y!.val, carry: carry)
+            carry = addition.1
             
             if  sum != nil {
-                sum?.next = ListNode(value)
+                sum?.next = ListNode(addition.0)
                 sum = sum?.next
             } else {
-                sum = ListNode(value)
+                sum = ListNode(addition.0)
                 head = sum
             }
             
@@ -58,12 +65,25 @@ class Solution {
 //            If there is a carry here it has the potential to chain down the list.
             if x == nil && y == nil {
                 sum?.next = ListNode(carry)
+                carry = 0
             } else if x != nil {
                 sum?.next = x!
             } else if y != nil {
                 sum?.next = y!
             }
-            sum?.next?.val += carry
+            var node = sum?.next
+            while node != nil && carry  > 0 {
+                let addition = checkAddition(node!.val, y: carry, carry: 0)
+                node?.val = addition.0
+                carry = addition.1
+                if carry > 0 && node?.next == nil {
+                    node?.next = ListNode(carry)
+                    carry = 0
+                }
+                node = node?.next
+            }
+            
+            
         } else {
             if x != nil {
                 sum?.next = x!
@@ -79,14 +99,14 @@ class Solution {
 }
 
 //: ### Put the following in a new linkedList Class.
-let a = ListNode(1)
+let a = ListNode(5)
 //a.next =  ListNode(9)
 //a.next?.next = ListNode(3)
 //a.next?.next?.next = ListNode(8)
 
 
-let b = ListNode(9)
-b.next = ListNode(9)
+let b = ListNode(5)
+//b.next = ListNode(9)
 //b.next?.next = ListNode(9)
 
 let sol = Solution()
