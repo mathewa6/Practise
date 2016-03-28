@@ -100,14 +100,14 @@ class Solution {
 
 //: ### Put the following in a new linkedList Class.
 let a = ListNode(5)
-//a.next =  ListNode(9)
-//a.next?.next = ListNode(3)
-//a.next?.next?.next = ListNode(8)
+a.next =  ListNode(9)
+a.next?.next = ListNode(3)
+a.next?.next?.next = ListNode(8)
 
 
 let b = ListNode(5)
-//b.next = ListNode(9)
-//b.next?.next = ListNode(9)
+b.next = ListNode(9)
+b.next?.next = ListNode(9)
 
 let sol = Solution()
 var ans = sol.addTwoNumbers(a, b)
