@@ -28,6 +28,24 @@ public class ListNode: CustomStringConvertible {
     }
 }
 
+public class LLNode<T>: CustomStringConvertible {
+    var value: T
+    var next: LLNode?
+    var previous: LLNode?
+    
+    public init(value: T) {
+        self.value = value
+    }
+    
+    public var description: String {
+        if self.next != nil {
+            return "\(self.value) > \(self.next!.value) "
+        }
+        
+        return "\(self.value)"
+    }
+}
+
 class Solution {
     func addTwoNumbers(l1: ListNode?, _ l2: ListNode?) -> ListNode? {
         var x = l1
