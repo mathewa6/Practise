@@ -12,3 +12,8 @@ func gcd(a: Int, _ b: Int) -> Int {
     }
 }
 
+func numberOfIntersectedSquares(x: Int, y: Int) -> Int {
+    return x + y - gcd(x, y)
+}
+
+numberOfIntersectedSquares(21, y: 2)
