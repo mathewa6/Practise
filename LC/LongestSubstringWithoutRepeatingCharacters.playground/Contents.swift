@@ -1,36 +1,26 @@
 
 //Insert each character into a set and then check for new characters existing in the set.
+// TODO: - Try http://www.geeksforgeeks.org/length-of-the-longest-substring-without-repeating-characters/ for alt solution.
 class Solution {
     func lengthOfLongestSubstring(s: String) -> Int {
-        var maxCount = s.isEmpty ? 0 : 1
+        var bowl = [Character : Int]()
+        var count = 0, left = 0
 
-        for (i, _) in s.characters.enumerate() {
-            var bowl: Set<Character> = []
-            var count = s.isEmpty ? 0 : 1
+
+        for (i, char) in s.characters.enumerate() {
             
-            for j in i..<s.characters.count {
-                let character = s[s.startIndex.advancedBy(j)]
-                if bowl.contains(character) {
-                    count = bowl.count > count ? bowl.count : count
-                    bowl.removeAll()
-                }
-                
-                if j == s.characters.count - 1 {
-                    bowl.insert(character)
-                    count = bowl.count > count ? bowl.count : count
-                }
-                
-                bowl.insert(character)
+            if let key = bowl[char] {
+                count = max(count, i - left)
+                left = max(left, key + 1)
             }
             
-            maxCount = max(count, maxCount)
+            bowl[char] = i
         }
         
-        return maxCount
-
+        return max(count, s.characters.count - left)
     }
 }
 
 let sol = Solution()
-let input = "jxgqtuorkyqyvnpmutwxhqufgazxfzbqzigseulrubpqree"
+let input = "dvdf" //jxgqtuorkyqyvnpmutwxhqufgazxfzbqzigseulrubpqree
 sol.lengthOfLongestSubstring(input)
