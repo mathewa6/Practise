@@ -2,36 +2,35 @@
 //Insert each character into a set and then check for new characters existing in the set.
 class Solution {
     func lengthOfLongestSubstring(s: String) -> Int {
-        var bowl: Set<Character> = []
-        var count = s.isEmpty ? 0 : 1
-        
-        var returnMax = count
-        
-        for (i, char) in s.characters.enumerate() {
-            if bowl.contains(char) {
-                count = bowl.count > count ? bowl.count : count
-                bowl.removeAll()
+        var maxCount = s.isEmpty ? 0 : 1
+
+        for (i, _) in s.characters.enumerate() {
+            var bowl: Set<Character> = []
+            var count = s.isEmpty ? 0 : 1
+            
+            for j in i..<s.characters.count {
+                let character = s[s.startIndex.advancedBy(j)]
+                if bowl.contains(character) {
+                    count = bowl.count > count ? bowl.count : count
+                    bowl.removeAll()
+                }
+                
+                if j == s.characters.count - 1 {
+                    bowl.insert(character)
+                    count = bowl.count > count ? bowl.count : count
+                }
+                
+                bowl.insert(character)
             }
             
-            bowl.insert(char)
-        }
-        returnMax =  max(count, bowl.count)
-        
-        bowl = []
-        count = s.isEmpty ? 0 : 1
-        for (i, char) in s.characters.enumerate().reverse() {
-            if bowl.contains(char) {
-                count = bowl.count > count ? bowl.count : count
-                bowl.removeAll()
-            }
-            
-            bowl.insert(char)
+            maxCount = max(count, maxCount)
         }
         
-        return  max(count, returnMax)
+        return maxCount
+
     }
 }
 
 let sol = Solution()
-let input = "asjrgapa"
+let input = "jxgqtuorkyqyvnpmutwxhqufgazxfzbqzigseulrubpqree"
 sol.lengthOfLongestSubstring(input)
