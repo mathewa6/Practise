@@ -54,6 +54,15 @@ func getDegree(data: Dictionary<Int, [Int]>) {
     }
 }
 
+func readFile(withName name: String) -> String? {
+    let splits = name.characters.split(".")
+    let path = NSBundle.mainBundle().pathForResource(String(splits.first!), ofType: String(splits.last!))
+    let content = NSFileManager.defaultManager().contentsAtPath(path!)
+    
+    return String(data: content!, encoding: NSUTF8StringEncoding)
+}
+
 let d = calculateGraphDegrees(3, pairs: arrayTest)
 getDegree(d)
-let dir = XCPSharedDataDirectoryPath
+//let dir = XCPSharedDataDirectoryPath
+readFile(withName: "input.txt")
