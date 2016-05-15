@@ -28,9 +28,6 @@ class Pair: CustomStringConvertible {
     }
 }
 
-let test = Pair(line: "1 16")
-let arrayTest = [Pair(line: "1 2"), Pair(line: "1 3")]
-
 func calculateGraphDegrees(total: Int, pairs: [Pair]) -> Dictionary<Int, [Int]> {
     var degreeDictionary: [Int: [Int]] = Dictionary<Int, [Int]>()
     
@@ -62,7 +59,25 @@ func readFile(withName name: String) -> String? {
     return String(data: content!, encoding: NSUTF8StringEncoding)
 }
 
-let d = calculateGraphDegrees(3, pairs: arrayTest)
-getDegree(d)
+
+//let test = Pair(line: "1 16")
+//let arrayTest = [Pair(line: "1 2"), Pair(line: "1 3")]
+//let d = calculateGraphDegrees(3, pairs: arrayTest)
+//getDegree(d)
 //let dir = XCPSharedDataDirectoryPath
-readFile(withName: "input.txt")
+
+let input: String = readFile(withName: "input.txt")!
+let lines = input.characters.split("\n")
+
+var dataArray: [Pair] = []
+var total: Int = 0
+for (i, line) in lines.enumerate() {
+    if i == 0 {
+        total = Int(String(line))!
+    } else {
+        dataArray.append(Pair(line: String(line)))
+    }
+}
+
+let answer = calculateGraphDegrees(total, pairs: dataArray)
+getDegree(answer)
