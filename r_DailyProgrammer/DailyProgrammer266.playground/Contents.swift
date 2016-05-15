@@ -51,6 +51,19 @@ func getDegree(data: Dictionary<Int, [Int]>) {
     }
 }
 
+func generateAdjacencyMatrix(data: Dictionary<Int, [Int]>) -> [[Int]] {
+    var matrix = [[Int]](count: data.keys.count, repeatedValue: [Int](count: data.keys.count, repeatedValue: 0))
+    
+    for i in 1...data.keys.count {
+        let line = data[i]!
+        for element in line {
+            matrix[i - 1][element - 1] = 1
+        }
+    }
+    
+    return matrix
+}
+
 func readFile(withName name: String) -> String? {
     let splits = name.characters.split(".")
     let path = NSBundle.mainBundle().pathForResource(String(splits.first!), ofType: String(splits.last!))
@@ -63,6 +76,7 @@ func readFile(withName name: String) -> String? {
 //let test = Pair(line: "1 16")
 //let arrayTest = [Pair(line: "1 2"), Pair(line: "1 3")]
 //let d = calculateGraphDegrees(3, pairs: arrayTest)
+//generateAdjacencyMatrix(d)
 //getDegree(d)
 //let dir = XCPSharedDataDirectoryPath
 
@@ -81,3 +95,4 @@ for (i, line) in lines.enumerate() {
 
 let answer = calculateGraphDegrees(total, pairs: dataArray)
 getDegree(answer)
+generateAdjacencyMatrix(answer)
