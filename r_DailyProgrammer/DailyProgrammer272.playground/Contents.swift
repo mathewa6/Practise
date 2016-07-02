@@ -7,12 +7,12 @@ import UIKit
 //http://mhorga.org/2015/10/05/image-processing-in-ios.html
 
 let a = 150
-let image = UIImage(named: "portal.jpg")!
+let image = UIImage(named: "image")!
 let rgba = RGBA(image: image)
+let xrgba = RGBA(image: image)
 //let new = rgba?.toImage()
-
-let contrasted = ditherSimple(rgba!).toImage()
-
+let simple = ditherSimple(rgba!).toImage()
+let fs = ditherFloydSteinberg(xrgba!).toImage()
 
 //let coordinate = Coordinate(x: 10, y: 32)
 //let index = findIndex(coordinate, rgba: rgba!)

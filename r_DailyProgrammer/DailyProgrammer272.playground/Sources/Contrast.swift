@@ -49,6 +49,23 @@ public struct Pixel: CustomStringConvertible {
         }
     }
     
+    public var grayscale: Int {
+        get {
+            return (Int(self.red) + Int(self.green) + Int(self.blue))/3
+        }
+        
+        set {
+            var value = newValue
+            if value > 255 {
+                value = 255
+            }
+            
+            self.red = UInt8(value)
+            self.green = UInt8(value)
+            self.blue = UInt8(value)
+        }
+    }
+    
     public var description: String {
         return "Pixel : \(value)"
     }
@@ -100,10 +117,17 @@ public struct RGBA: CustomStringConvertible {
     public var description: String {
         return "(\(width), \(height)), \(width*height)"
     }
-}
-
-public func findIndex(coordinate: Coordinate, rgba: RGBA) -> Int {
-    return coordinate.y * rgba.width + coordinate.x
+    
+    public subscript(index: (Int, Int)) -> Pixel {
+        get {
+            let position = index.1 * width + index.0
+            return pixels[position]
+        }
+        set {
+            let position = index.1 * width + index.0
+            pixels[position] = newValue
+        }
+    }
 }
 
 public func findAverageColors(rgba: RGBA) -> (Int, Int, Int) {
@@ -192,6 +216,51 @@ public func ditherSimple(rgba: RGBA) -> RGBA {
             pixel.blue = UInt8(diffusedPixel)
             
             rgba.pixels[index] = pixel
+        }
+    }
+    
+    return rgba
+}
+
+func set(inout pixel: Pixel, toValue value: Int) {
+    pixel.red = UInt8(value)
+    pixel.green = UInt8(value)
+    pixel.blue = UInt8(value)
+}
+
+public func ditherFloydSteinberg(imageData: RGBA) -> RGBA {
+    var rgba = imageData
+    var previousError = 0
+    
+    for y in 0..<rgba.height {
+        for x in 0..<rgba.width {
+            var pixel = rgba[x,y]
+            
+            //Calculate the grayscale by R+G+B/3 for each pixel
+            var grayscale = pixel.grayscale
+            grayscale += previousError
+            
+            var diffusedPixel = 0
+            
+            //Check if that value is closer to 0 or 255
+            if grayscale < 128 {
+                diffusedPixel = 0
+            } else {
+                diffusedPixel = 255
+            }
+            
+            //Update Error
+            previousError = grayscale - diffusedPixel
+            
+//            set(&pixel, toValue: diffusedPixel)
+            
+//            rgba[x,y] = pixel
+            rgba[x,y].grayscale = diffusedPixel
+//            print("\(rgba[(x+1, y)].grayscale), \(Int(Double(previousError) * (7.0/16)))")
+//            rgba[((x+1), y)].grayscale += Int(Double(previousError) * (7.0/16))
+//            rgba[(x-1, y+1)].grayscale += Int(Double(previousError) * (3.0/16))
+//            rgba[(x, y+1)].grayscale += Int(Double(previousError) * (5.0/16))
+//            rgba[(x+1, y+1)].grayscale += Int(Double(previousError) * (1.0/16))
         }
     }
     
