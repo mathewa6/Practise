@@ -188,34 +188,31 @@ public func grayscale(rgba: RGBA) -> RGBA {
 
 }
 
-public func ditherSimple(rgba: RGBA) -> RGBA {
+public func ditherSimple(imageData: RGBA) -> RGBA {
+    var rgba = imageData
     var previousError = 0
     
     for y in 0..<rgba.height {
         for x in 0..<rgba.width {
-            let index = y * rgba.width + x
-            var pixel = rgba.pixels[index]
+            var pixel = rgba[x,y]
             
             //Calculate the grayscale by R+G+B/3 for each pixel
-            var grayscale = (Int(pixel.red) + Int(pixel.green) + Int(pixel.blue))/3
+            var grayscale = pixel.grayscale
             grayscale += previousError
-
+            
             var diffusedPixel = 0
+            
             //Check if that value is closer to 0 or 255
             if grayscale < 128 {
                 diffusedPixel = 0
             } else {
                 diffusedPixel = 255
             }
+            
             //Update Error
             previousError = grayscale - diffusedPixel
             
-            //Set to black or white
-            pixel.red = UInt8(diffusedPixel)
-            pixel.green = UInt8(diffusedPixel)
-            pixel.blue = UInt8(diffusedPixel)
-            
-            rgba.pixels[index] = pixel
+            rgba[x,y].grayscale = diffusedPixel
         }
     }
     
