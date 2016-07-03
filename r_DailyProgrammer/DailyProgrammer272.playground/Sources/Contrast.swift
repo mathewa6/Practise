@@ -73,7 +73,7 @@ public struct Pixel: CustomStringConvertible {
     }
 }
 
-public struct RGBA: CustomStringConvertible {
+public class RGBA: CustomStringConvertible {
     public var pixels: UnsafeMutableBufferPointer<Pixel>
     public var width: Int
     public var height: Int
@@ -190,8 +190,7 @@ public func grayscale(rgba: RGBA) -> RGBA {
 
 }
 
-public func ditherSimple(imageData: RGBA) -> RGBA {
-    var rgba = imageData
+public func ditherSimple(rgba: RGBA) -> RGBA {
     var previousError = 0
     
     for y in 0..<rgba.height {
@@ -221,14 +220,7 @@ public func ditherSimple(imageData: RGBA) -> RGBA {
     return rgba
 }
 
-func set(inout pixel: Pixel, toValue value: Int) {
-    pixel.red = UInt8(value)
-    pixel.green = UInt8(value)
-    pixel.blue = UInt8(value)
-}
-
-public func ditherFloydSteinberg(imageData: RGBA) -> RGBA {
-    var rgba = imageData
+public func ditherFloydSteinberg(rgba: RGBA) -> RGBA {
     var previousError = 0
     
     for y in 0..<rgba.height {
@@ -248,8 +240,8 @@ public func ditherFloydSteinberg(imageData: RGBA) -> RGBA {
             previousError = pixel.grayscale - diffusedPixel
             
             rgba[x,y].grayscale = diffusedPixel
+            
             if x < rgba.width - 1 {
-//                print(rgba[((x+1), y)].grayscale, x, y, Int(Double(previousError) * (7.0/16)))
                 rgba[((x+1), y)].grayscale += Int(Double(previousError) * (7.0/16))
             }
             
