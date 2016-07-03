@@ -7,7 +7,7 @@ import UIKit
 //http://mhorga.org/2015/10/05/image-processing-in-ios.html
 
 let a = 150
-let image = UIImage(named: "image")!
+let image = UIImage(named: "portal.jpg")!
 let rgba = RGBA(image: image)
 let xrgba = RGBA(image: image)
 //let new = rgba?.toImage()

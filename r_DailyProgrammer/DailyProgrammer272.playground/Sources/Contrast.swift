@@ -58,6 +58,8 @@ public struct Pixel: CustomStringConvertible {
             var value = newValue
             if value > 255 {
                 value = 255
+            } else if value < 0 {
+                value = 0
             }
             
             self.red = UInt8(value)
@@ -233,31 +235,35 @@ public func ditherFloydSteinberg(imageData: RGBA) -> RGBA {
         for x in 0..<rgba.width {
             var pixel = rgba[x,y]
             
-            //Calculate the grayscale by R+G+B/3 for each pixel
-            var grayscale = pixel.grayscale
-            grayscale += previousError
-            
             var diffusedPixel = 0
             
             //Check if that value is closer to 0 or 255
-            if grayscale < 128 {
+            if pixel.grayscale < 128 {
                 diffusedPixel = 0
             } else {
                 diffusedPixel = 255
             }
             
             //Update Error
-            previousError = grayscale - diffusedPixel
+            previousError = pixel.grayscale - diffusedPixel
             
-//            set(&pixel, toValue: diffusedPixel)
-            
-//            rgba[x,y] = pixel
             rgba[x,y].grayscale = diffusedPixel
-//            print("\(rgba[(x+1, y)].grayscale), \(Int(Double(previousError) * (7.0/16)))")
-//            rgba[((x+1), y)].grayscale += Int(Double(previousError) * (7.0/16))
-//            rgba[(x-1, y+1)].grayscale += Int(Double(previousError) * (3.0/16))
-//            rgba[(x, y+1)].grayscale += Int(Double(previousError) * (5.0/16))
-//            rgba[(x+1, y+1)].grayscale += Int(Double(previousError) * (1.0/16))
+            if x < rgba.width - 1 {
+//                print(rgba[((x+1), y)].grayscale, x, y, Int(Double(previousError) * (7.0/16)))
+                rgba[((x+1), y)].grayscale += Int(Double(previousError) * (7.0/16))
+            }
+            
+            if x > 0 && y < rgba.height - 1 {
+                rgba[(x-1, y+1)].grayscale += Int(Double(previousError) * (3.0/16))
+            }
+            
+            if y < rgba.height - 1 {
+                rgba[(x, y+1)].grayscale += Int(Double(previousError) * (5.0/16))
+            }
+            
+            if x < rgba.width - 1 && y < rgba.height - 1 {
+                rgba[(x+1, y+1)].grayscale += Int(Double(previousError) * (1.0/16))
+            }
         }
     }
     
