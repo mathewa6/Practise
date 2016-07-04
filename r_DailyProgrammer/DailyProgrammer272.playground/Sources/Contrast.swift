@@ -262,10 +262,13 @@ public func ditherFloydSteinberg(rgba: RGBA) -> RGBA {
     return rgba
 }
 
-func generateBayer(size: Int) {
-    
+// https://www.reddit.com/r/dailyprogrammer/comments/4paxp4/20160622_challenge_272_intermediate_dither_that/d4jhrit
+func generateBayer(size: Int) -> [[Int]]{
+    return [[0]]
 }
 
+// http://alamos.math.arizona.edu/~rychlik/CourseDir/535/resources/RasterGraphics_slides.pdf
+// https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/dither/dither.pdf
 public func ditherBayer(rgba: RGBA) {
     
 }
