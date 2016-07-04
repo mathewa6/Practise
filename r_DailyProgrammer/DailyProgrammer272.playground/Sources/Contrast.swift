@@ -261,3 +261,11 @@ public func ditherFloydSteinberg(rgba: RGBA) -> RGBA {
     
     return rgba
 }
+
+func generateBayer(size: Int) {
+    
+}
+
+public func ditherBayer(rgba: RGBA) {
+    
+}
