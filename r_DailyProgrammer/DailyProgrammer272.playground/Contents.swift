@@ -10,9 +10,13 @@ let a = 150
 let image = UIImage(named: "portal.jpg")!
 let rgba = RGBA(image: image)
 let xrgba = RGBA(image: image)
+let yrgba = RGBA(image: image)
+
 //let new = rgba?.toImage()
 let simple = ditherSimple(rgba!).toImage()
 let fs = ditherFloydSteinberg(xrgba!).toImage()
+
+let bs = ditherBayer(yrgba!).toImage()
 
 //let coordinate = Coordinate(x: 10, y: 32)
 //let index = findIndex(coordinate, rgba: rgba!)

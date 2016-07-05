@@ -230,16 +230,12 @@ public func ditherFloydSteinberg(rgba: RGBA) -> RGBA {
             var diffusedPixel = 0
             
             //Check if that value is closer to 0 or 255
-            if pixel.grayscale < 128 {
-                diffusedPixel = 0
-            } else {
-                diffusedPixel = 255
-            }
+            diffusedPixel = pixel.grayscale < 128 ? 0 : 255
             
             //Update Error
             previousError = pixel.grayscale - diffusedPixel
             
-            rgba[x,y].grayscale = diffusedPixel
+            rgba[x,y].grayscale = diffusedPixel //pixel.grayscale doesn't work???
             
             if x < rgba.width - 1 {
                 rgba[((x+1), y)].grayscale += Int(Double(previousError) * (7.0/16))
@@ -264,11 +260,21 @@ public func ditherFloydSteinberg(rgba: RGBA) -> RGBA {
 
 // https://www.reddit.com/r/dailyprogrammer/comments/4paxp4/20160622_challenge_272_intermediate_dither_that/d4jhrit
 func generateBayer(size: Int) -> [[Int]]{
-    return [[0]]
+    return [[0, 2], [3, 1]]
 }
 
 // http://alamos.math.arizona.edu/~rychlik/CourseDir/535/resources/RasterGraphics_slides.pdf
 // https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/dither/dither.pdf
-public func ditherBayer(rgba: RGBA) {
+public func ditherBayer(rgba: RGBA) -> RGBA {
+    for y in 0..<rgba.height {
+        for x in 0..<rgba.width {
+            let matrix = generateBayer(2)
+            
+            rgba[x,y].grayscale += ( rgba[x,y].grayscale * matrix[x % 2][y % 2])
+            
+            rgba[x,y].grayscale = rgba[x,y].grayscale < 128 ? 0 : 255
+        }
+    }
     
+    return rgba
 }
