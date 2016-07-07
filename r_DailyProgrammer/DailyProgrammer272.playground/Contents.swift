@@ -6,17 +6,16 @@ import UIKit
 
 //http://mhorga.org/2015/10/05/image-processing-in-ios.html
 
-let a = 150
-let image = UIImage(named: "portal.jpg")!
-let rgba = RGBA(image: image)
-let xrgba = RGBA(image: image)
-let yrgba = RGBA(image: image)
+//let image = UIImage(named: "portal.jpg")!
+//let rgba = RGBA(image: image)
+//let xrgba = RGBA(image: image)
+//let yrgba = RGBA(image: image)
 
 //let new = rgba?.toImage()
-let simple = ditherSimple(rgba!).toImage()
-let fs = ditherFloydSteinberg(xrgba!).toImage()
+//let simple = ditherSimple(rgba!).toImage()
+//let fs = ditherFloydSteinberg(xrgba!).toImage()
 
-let bs = ditherBayer(yrgba!).toImage()
+//let bs = ditherBayer(yrgba!).toImage()
 
 //let coordinate = Coordinate(x: 10, y: 32)
 //let index = findIndex(coordinate, rgba: rgba!)
@@ -30,3 +29,19 @@ let bs = ditherBayer(yrgba!).toImage()
 //let blue = UInt8(p.value >> 16 & 0xFF)
 //let alpha = UInt8(p.value >> 24 & 0xFF)
 
+func generateBayer(size: Int, input: [[Int]]? = []) -> [[Int]]{
+    
+    if input?.count == 0 {
+        return [[0, 2], [3, 1]]
+    }
+    
+    if input!.count >= size {
+        return input!
+    }
+    
+    var output = [[Int]](count: size * 2, repeatedValue: [Int](count: size * 2, repeatedValue: 0))
+    
+    return generateBayer(size, input: nil)
+}
+
+generateBayer(2)
