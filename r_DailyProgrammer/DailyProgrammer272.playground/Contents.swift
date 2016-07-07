@@ -34,11 +34,7 @@ class Matrix<T>  {
     
 }
 
-func generateBayer(size: Int, input: [[Int]]? = []) -> [[Int]]{
-    
-    if input?.count == 0 {
-        return [[0, 2], [3, 1]]
-    }
+func generateBayer(size: Int, input: [[Int]]? = [[0, 2], [3, 1]]) -> [[Int]]{
     
     if input!.count >= size {
         return input!
@@ -47,14 +43,13 @@ func generateBayer(size: Int, input: [[Int]]? = []) -> [[Int]]{
     var output = [[Int]](count: input!.count * 2, repeatedValue: [Int](count: input!.count * 2, repeatedValue: 0))
     
     for (y, row) in output.enumerate() {
-        for (x, element) in row.enumerate() {
+        for (x, _) in row.enumerate() {
             let padding = input![x > input!.count/2 ? 1 : 0][y > input!.count/2 ? 1 : 0]
             output[x][y] = 4 * input![x % input!.count][y % input!.count] + padding
-//            print(x, y, output[x][y], padding)
         }
     }
     
     return generateBayer(size, input: output)
 }
 
-generateBayer(4, input: [[0, 2], [3, 1]])
+generateBayer(4)
