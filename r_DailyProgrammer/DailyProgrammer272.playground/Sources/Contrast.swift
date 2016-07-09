@@ -294,7 +294,7 @@ public func createThreshold(bayer: [[Int]]) -> [[Int]] {
 public func ditherBayer(rgba: RGBA) -> RGBA {
     for y in 0..<rgba.height {
         for x in 0..<rgba.width {
-            let bayerSize = 4
+            let bayerSize = 8
             let matrix = generateBayer(bayerSize)
             let threshold = createThreshold(matrix)
             
