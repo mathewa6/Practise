@@ -52,4 +52,17 @@ func generateBayer(size: Int, input: [[Int]]? = [[0, 2], [3, 1]]) -> [[Int]]{
     return generateBayer(size, input: output)
 }
 
-generateBayer(4)
+func createThreshold(bayer: [[Int]]) -> [[Int]] {
+    var output = [[Int]](count: bayer.count, repeatedValue: [Int](count: bayer.count, repeatedValue: 0))
+    
+    for (y, row) in bayer.enumerate() {
+        for (x, _) in row.enumerate() {
+            output[x][y] = 255 * Int(Double(bayer[x][y]) + 0.5)/(bayer.count * bayer.count)
+        }
+    }
+    
+    return output
+}
+
+let a = generateBayer(4)
+let b = createThreshold(a)
