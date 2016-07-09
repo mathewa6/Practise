@@ -259,8 +259,34 @@ public func ditherFloydSteinberg(rgba: RGBA) -> RGBA {
 }
 
 // https://www.reddit.com/r/dailyprogrammer/comments/4paxp4/20160622_challenge_272_intermediate_dither_that/d4jhrit
-func generateBayer(size: Int) -> [[Int]]{
-    return [[0, 2], [3, 1]]
+public func generateBayer(size: Int, input: [[Int]]? = [[0, 2], [3, 1]]) -> [[Int]]{
+    
+    if input!.count >= size {
+        return input!
+    }
+    
+    var output = [[Int]](count: input!.count * 2, repeatedValue: [Int](count: input!.count * 2, repeatedValue: 0))
+    
+    for (y, row) in output.enumerate() {
+        for (x, _) in row.enumerate() {
+            let padding = input![x > input!.count/2 ? 1 : 0][y > input!.count/2 ? 1 : 0]
+            output[x][y] = 4 * input![x % input!.count][y % input!.count] + padding
+        }
+    }
+    
+    return generateBayer(size, input: output)
+}
+
+public func createThreshold(bayer: [[Int]]) -> [[Int]] {
+    var output = [[Int]](count: bayer.count, repeatedValue: [Int](count: bayer.count, repeatedValue: 0))
+    
+    for (y, row) in bayer.enumerate() {
+        for (x, _) in row.enumerate() {
+            output[x][y] = 255 * Int(Double(bayer[x][y]) + 0.5)/(bayer.count * bayer.count)
+        }
+    }
+    
+    return output
 }
 
 // http://alamos.math.arizona.edu/~rychlik/CourseDir/535/resources/RasterGraphics_slides.pdf
@@ -268,11 +294,13 @@ func generateBayer(size: Int) -> [[Int]]{
 public func ditherBayer(rgba: RGBA) -> RGBA {
     for y in 0..<rgba.height {
         for x in 0..<rgba.width {
-            let matrix = generateBayer(2)
+            let bayerSize = 4
+            let matrix = generateBayer(bayerSize)
+            let threshold = createThreshold(matrix)
             
-            rgba[x,y].grayscale += ( rgba[x,y].grayscale * matrix[x % 2][y % 2])
+//            rgba[x,y].grayscale += ( rgba[x,y].grayscale * matrix[x % 4][y % 4])
             
-            rgba[x,y].grayscale = rgba[x,y].grayscale < 128 ? 0 : 255
+            rgba[x,y].grayscale = rgba[x,y].grayscale < threshold[x % bayerSize][y % bayerSize] ? 0 : 255
         }
     }
     
