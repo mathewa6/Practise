@@ -14,7 +14,7 @@ import UIKit
 
  [alanduncan.me]
  */
-struct SpirographGenerator: IteratorProtocol {
+struct SpirographGenerator: IteratorProtocol, CustomPlaygroundQuickLookable {
     
     var offset, dTheta, dR, minorRadius, majorRadius: Double
     var theta = 0.0
@@ -35,4 +35,53 @@ struct SpirographGenerator: IteratorProtocol {
         
         return CGPoint(x: CGFloat(xT), y: CGFloat(yT))
     }
+    
+    
+    /// To be able to use Erica's next() function without mutating theta(so that it can be used in PlaygroundQuickLook), the trivial fix is to use one that returns updated theta values.
+    ///
+    /// - Parameters:
+    ///   - currentTheta: Updated values of theta.
+    ///   - d: dTheta
+    /// - Returns: A tuple of (CGPoint?, newTheta)
+    func next(currentTheta: Double, d: Double) -> (CGPoint?, Double) {
+        let xT: Double = dR * cos(currentTheta) + offset * cos(dR * currentTheta/minorRadius)
+        let yT: Double = dR * sin(currentTheta) + offset * sin(dR * currentTheta/minorRadius)
+        
+        return (CGPoint(x: CGFloat(xT), y: CGFloat(yT)), currentTheta + d)
+    }
+    
+    var customPlaygroundQuickLook: PlaygroundQuickLook {
+        let dimension_2:CGFloat = 125
+        let n = 20
+        let iterations = 15
+
+        let size = CGSize(width: dimension_2 * 2, height: dimension_2 * 2)
+        
+        UIGraphicsBeginImageContext(size)
+        let ctx = UIGraphicsGetCurrentContext()
+        var t = theta
+        for i in 0...iterations*n {
+            let p: CGPoint?
+            (p, t) = next(currentTheta: t, d: dTheta)
+            if i == 0 {
+                ctx!.move(to: CGPoint(x: p!.x+dimension_2, y: p!.y+dimension_2))
+            }
+            else {
+                ctx!.addLine(to: CGPoint(x: p!.x+dimension_2, y: p!.y+dimension_2))
+            }
+            
+        }
+        ctx!.strokePath()
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return .image(image!)
+    }
 }
+
+let sampleSize = 25
+let (majorR, minorR) = (25.0, -47.0)
+
+var spiro = SpirographGenerator(majorRadius: majorR,
+                                minorRadius: minorR,
+                                offset: 25,
+                                samples: Double(sampleSize))
