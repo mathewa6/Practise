@@ -44,5 +44,18 @@ func twoSum(forSum sum: Int, withArray array: [Int]) -> Bool {
     return isTrue
 }
 
+func threeSum(forSum sum: Int, withArray array: [Int]) -> Bool {
+    var isTrue = false
+    
+    for x in array {
+        let isTwoTrue = twoSum(forSum: sum-x, withArray: array)
+        if isTwoTrue {
+            isTrue = true
+        }
+    }
+    
+    return isTrue
+}
+
 let testArray = [1, 5, 7]
-twoSum(forSum: 6, withArray: testArray)
+threeSum(forSum: 6, withArray: testArray)
