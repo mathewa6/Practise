@@ -27,13 +27,18 @@ func testFunc( ptr:inout UnsafeMutablePointer<Int>, val:Int) {
  threeSum(): Finds whether 3 elements add to 'sum' by calling twoSum().
  */
 /// http://blog.gainlo.co/index.php/2016/07/19/3sum/
-func twoSum(forSum sum: Int, withArray array: [Int]) -> Bool {
+func twoSum(forSum sum: Int, withArray array: [Int]) -> (Bool, (Int, Int)) {
     
     // Is array sorted? For now, assume it is
     
     var a = 0 // Leading index
     var b = array.count - 1 // Trailing index
-    var s = array[a] + array[b] // Sum of elements at the leading and trailing indices
+    var x = array[a]
+    var y = array[b]
+    
+    var s =  array[a] + array[b] // Sum of elements at the leading and trailing indices
+    var sdiff = abs(sum - s)
+    
     var exists = false
     
     // As long as the indices aren't meeting, iterate...
@@ -42,26 +47,39 @@ func twoSum(forSum sum: Int, withArray array: [Int]) -> Bool {
         // If the sum of elements at indices a & b equals sum, then the 2Sum exists.
         if s == sum  {
             exists = true
+            x = array[a]
+            y = array[b]
             break
         } else if s > sum {
             b -= 1
+            if abs(sum - (array[a] + array[b])) <= abs(sdiff) {
+                y = a == b ? array[b+1] : array[b]
+                s = array[a] + array[b]
+                sdiff = abs(sum - s)
+            }
         } else {
             a += 1
+            print(abs(sum - (array[a] + array[b])), abs(sdiff))
+            if abs(sum - (array[a] + array[b])) <= abs(sdiff) {
+                x = a == b ? array[a-1] : array[a]
+                s = array[a] + array[b]
+                sdiff = abs(sum - s)
+            }
         }
         // Otherwise, pull the trailing back if a + b > sum
         // Or push the leading forward if a + b < sum
         
-        s = array[a] + array[b]
+
     }
     
-    return exists
+    return (exists, (x, y))
 }
 
 func threeSum(forSum sum: Int, withArray array: [Int]) -> Bool {
     var sumExists = false
     
     for x in array {
-        let isTwoTrue = twoSum(forSum: sum-x, withArray: array)
+        let (isTwoTrue, _) = twoSum(forSum: sum-x, withArray: array)
         if isTwoTrue {
             sumExists = true
         }
@@ -70,5 +88,5 @@ func threeSum(forSum sum: Int, withArray array: [Int]) -> Bool {
     return sumExists
 }
 
-let testArray = [1, 5, 7]
-threeSum(forSum: 6, withArray: testArray)
+let testArray = [1, 5, 7, 13, 33]
+twoSum(forSum: 9, withArray: testArray)
