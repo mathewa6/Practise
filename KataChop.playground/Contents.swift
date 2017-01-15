@@ -1,7 +1,9 @@
 // A contorted variation of http://codekata.com/kata/kata02-karate-chop/
 
-func chop(value: Int, list: [Int]) -> Int {
+func chop(_ value: Int, _ list: [Int]) -> Int {
     
+    // Checks a subarray for the given value if its count == 1, otherwise
+    // returns whether the value might be contained in the subarray's values.
     func checkChop(chop: [Int], value: Int) -> (contained: Bool, nextChop: [Int]?) {
         var returnChop: [Int]?
         
@@ -19,10 +21,14 @@ func chop(value: Int, list: [Int]) -> Int {
     }
     
     let n = list.count
-    var indices = Array(0 ..< n)
+    let indices = Array(0 ..< n)
     
-    var splits = list.split()!
-    var splitx = indices.split()!
+    // Create two arrays one splitting the original and the other splitting the 'indices'
+    // This is so splitx can track the original index of an element if it is what we're looking for.
+    // For single element list, the following return nil.
+    // The ?? handling can instead just be done inside split()
+    var splits = list.split() ?? (left: [1], right: [])
+    var splitx = indices.split() ?? (left: [0], right: [])
     
     while splits.left.count > 0 || splits.right.count > 0 {
         var nextSplit: [Int]?
@@ -46,6 +52,7 @@ func chop(value: Int, list: [Int]) -> Int {
 }
 
 extension Array {
+    // Divides the array into two subarrays and returns a tuple (left:, right:) containing them.
     func split() -> (left: [Element], right: [Element])? {
         let n = self.count
         if n == 1 {
@@ -55,13 +62,41 @@ extension Array {
         return (left: Array(self[0 ..< half]), right: Array(self[half ..< n]))
     }
     
+    // Returns whether a given sorted array contains a value within
+    // the values of its lower and highest elements.
     func asRangeCovers(value: Int) -> Bool {
         return value <= self.last as! Int && value >= self.first as! Int
     }
 }
 
-let test = [1, 3, 5, 7, 9, 11]
+// Test asserts from pragdave.
+func test_chop() {
+    assert(-1 == chop(3, []))
+    assert(-1 == chop(3, [1]))
+    assert( 0 == chop(1, [1]))
+    
+    assert( 0 == chop(1, [1, 3, 5]))
+    assert( 1 == chop(3, [1, 3, 5]))
+    assert( 2 == chop(5, [1, 3, 5]))
+    assert(-1 == chop(0, [1, 3, 5]))
+    assert(-1 == chop(2, [1, 3, 5]))
+    assert(-1 == chop(4, [1, 3, 5]))
+    assert(-1 == chop(6, [1, 3, 5]))
+    
+    assert( 0 == chop(1, [1, 3, 5, 7]))
+    assert( 1 == chop(3, [1, 3, 5, 7]))
+    assert( 2 == chop(5, [1, 3, 5, 7]))
+    assert( 3 == chop(7, [1, 3, 5, 7]))
+    assert(-1 == chop(0, [1, 3, 5, 7]))
+    assert(-1 == chop(2, [1, 3, 5, 7]))
+    assert(-1 == chop(4, [1, 3, 5, 7]))
+    assert(-1 == chop(6, [1, 3, 5, 7]))
+    assert(-1 == chop(8, [1, 3, 5, 7]))
+}
+
+let test = [1]
 // test.split().left.split()
 // test.asRangeCovers(value: 6)
 // let x = Array(test[0 ..< test.count/2])
-chop(value: 1, list: test)
+//chop(3, test)
+test_chop()
