@@ -60,7 +60,7 @@ class CHFParser: NSObject, XMLParserDelegate {
                 qualifiedName qName: String?,
                 attributes attributeDict: [String : String] = [:]) {
         currentContent = ""
-        print("Begin: ", elementName)
+        print("Begin: ", elementName, Array(attributeDict.keys))
     }
     
     func parser(_ parser: XMLParser, foundCharacters string: String) {
@@ -72,7 +72,7 @@ class CHFParser: NSObject, XMLParserDelegate {
                 didEndElement elementName: String,
                 namespaceURI: String?,
                 qualifiedName qName: String?) {
-        print("End: ", elementName, currentContent)
+        print("End: ", elementName)
 
         // If the current XML elements name is 'description' and it contains HTML content
         // (There's got to be a better way to detect HTML right?...)
