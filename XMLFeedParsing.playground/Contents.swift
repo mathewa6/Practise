@@ -21,10 +21,16 @@ extension String {
     }
 }
 
-class XFPReview {
+class XFPReview: CustomStringConvertible {
     var title: String?
     var author: String?
-    var contect: String?
+    var content: String?
+    var rating: Int?
+    var version: String?
+    
+    var description: String {
+        return "REVIEW,\n \(title),\n \(content),\n \(author),\n \(rating)"
+    }
 }
 
 protocol CHFParserDelegate: class {
@@ -35,6 +41,8 @@ protocol CHFParserDelegate: class {
 class CHFParser: NSObject, XMLParserDelegate {
     
     private var currentContent: String = String()
+    
+    private var currentReview: XFPReview?
     
     weak var delegate: CHFParserDelegate?
     
@@ -64,12 +72,16 @@ class CHFParser: NSObject, XMLParserDelegate {
                 namespaceURI: String?,
                 qualifiedName qName: String?,
                 attributes attributeDict: [String : String] = [:]) {
-        currentContent = ""
-        print("Begin: ", elementName, Array(attributeDict.keys))
+        self.currentContent = ""
+//        print("Begin: ", elementName, Array(attributeDict.keys))
+        if elementName == "entry" {
+            print(self.currentReview ?? "NO REVIEW")
+            self.currentReview = XFPReview()
+        }
     }
     
     func parser(_ parser: XMLParser, foundCharacters string: String) {
-        currentContent += string
+        self.currentContent += string
 //        print("Content: \(currentContent)")
     }
     
@@ -77,25 +89,32 @@ class CHFParser: NSObject, XMLParserDelegate {
                 didEndElement elementName: String,
                 namespaceURI: String?,
                 qualifiedName qName: String?) {
-        print("End: ", elementName)
+//        print("End: ", elementName)
 
         // If the current XML elements name is 'description' and it contains HTML content
         // (There's got to be a better way to detect HTML right?...)
-        if currentContent.contains("<") && elementName == "content" {
+        if self.currentContent.contains("<") && elementName == "content" {
         
             // Convert the entire HTML doc to an AttributedString and then back again to string to strip away all HTML.
-            currentContent = currentContent.unescape() + "\n"
-            delegate?.feed += currentContent
+            self.currentContent = self.currentContent.unescape() + "\n"
+            delegate?.feed += self.currentContent
 
 //        }
         } else if elementName == "title" {
-            delegate?.feed += currentContent + "\n"
+            delegate?.feed += self.currentContent + "\n"
+            self.currentReview?.title = self.currentContent
         } else if elementName == "name" {
-            delegate?.feed += "NAME : " + currentContent + "\n"
+            delegate?.feed += "NAME : " + self.currentContent + "\n"
+            self.currentReview?.author = self.currentContent
+        } else if elementName == "im:version" {
+            self.currentReview?.version = self.currentContent
+        } else if elementName == "im:rating" {
+            self.currentReview?.rating = Int(self.currentContent)
         }
     }
     
     func parserDidEndDocument(_ parser: XMLParser) {
+        print(self.currentReview ?? "NO REVIEW")
         self.delegate?.parsingDidEnd()
     }
     
