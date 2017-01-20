@@ -21,6 +21,11 @@ extension String {
     }
 }
 
+class XFPReview {
+    var title: String?
+    var author: String?
+    var contect: String?
+}
 
 protocol CHFParserDelegate: class {
     var feed: String { get set }
