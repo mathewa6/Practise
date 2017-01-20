@@ -1,3 +1,5 @@
+import Foundation
+
 // A contorted variation of http://codekata.com/kata/kata02-karate-chop/
 
 func chop(_ value: Int, _ list: [Int]) -> Int {
@@ -51,6 +53,25 @@ func chop(_ value: Int, _ list: [Int]) -> Int {
     return -1
 }
 
+func chop(value: Int, list: [Int], l: Int, r: Int) -> Int {
+    
+    if r >= l {
+        let idx = l + ( r - l )/2
+        if list[idx] == value {
+            return idx
+        }
+        
+        if value < list[idx] {
+            return chop(value: value, list: list, l: l, r: idx - 1)
+        } else {
+            return chop(value: value, list: list, l: idx + 1, r: r)
+        }
+    }
+
+    
+    return -1
+}
+
 extension Array {
     // Divides the array into two subarrays and returns a tuple (left:, right:) containing them.
     func split() -> (left: [Element], right: [Element])? {
@@ -94,7 +115,8 @@ func test_chop() {
     assert(-1 == chop(8, [1, 3, 5, 7]))
 }
 
-let test = [1]
+let test = [1, 2, 3, 4]
+//chop(value: 3, list: test, l: 0, r: test.count-1)
 // test.split().left.split()
 // test.asRangeCovers(value: 6)
 // let x = Array(test[0 ..< test.count/2])
