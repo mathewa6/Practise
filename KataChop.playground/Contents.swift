@@ -72,6 +72,26 @@ func chop(value: Int, list: [Int], l: Int, r: Int) -> Int {
     return -1
 }
 
+func chop_iter(value: Int, list: [Int], l: Int, r: Int) -> Int {
+    var left = l, right = r
+    
+    while right >= left {
+        let idx = (left + right)/2
+        if list[idx] == value {
+            return idx
+        }
+        
+        if value < list[idx] {
+            right = idx - 1
+            continue
+        } else {
+            left = idx + 1
+            continue
+        }
+    }
+    return -1
+}
+
 extension Array {
     // Divides the array into two subarrays and returns a tuple (left:, right:) containing them.
     func split() -> (left: [Element], right: [Element])? {
@@ -116,9 +136,9 @@ func test_chop() {
 }
 
 let test = [1, 2, 3, 4]
-//chop(value: 3, list: test, l: 0, r: test.count-1)
+chop_iter(value: 3, list: test, l: 0, r: test.count-1)
 // test.split().left.split()
 // test.asRangeCovers(value: 6)
 // let x = Array(test[0 ..< test.count/2])
 //chop(3, test)
-test_chop()
+//test_chop()
