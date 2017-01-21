@@ -2,7 +2,7 @@ import Foundation
 
 // A contorted variation of http://codekata.com/kata/kata02-karate-chop/
 
-func chop(_ value: Int, _ list: [Int]) -> Int {
+func chop(value: Int, list: [Int]) -> Int {
     
     // Checks a subarray for the given value if its count == 1, otherwise
     // returns whether the value might be contained in the subarray's values.
@@ -53,7 +53,12 @@ func chop(_ value: Int, _ list: [Int]) -> Int {
     return -1
 }
 
-func chop(value: Int, list: [Int], l: Int, r: Int) -> Int {
+func chop(_ value: Int, _ list: [Int]) -> Int {
+//    return chop_recursive(value: value, list: list, l: 0, r: list.count - 1)
+    return chop_iter(value: value, list: list, l: 0, r: list.count - 1)
+}
+
+func chop_recursive(value: Int, list: [Int], l: Int, r: Int) -> Int {
     
     if r >= l {
         let idx = l + ( r - l )/2
@@ -62,13 +67,12 @@ func chop(value: Int, list: [Int], l: Int, r: Int) -> Int {
         }
         
         if value < list[idx] {
-            return chop(value: value, list: list, l: l, r: idx - 1)
+            return chop_recursive(value: value, list: list, l: l, r: idx - 1)
         } else {
-            return chop(value: value, list: list, l: idx + 1, r: r)
+            return chop_recursive(value: value, list: list, l: idx + 1, r: r)
         }
     }
 
-    
     return -1
 }
 
@@ -89,6 +93,7 @@ func chop_iter(value: Int, list: [Int], l: Int, r: Int) -> Int {
             continue
         }
     }
+    
     return -1
 }
 
@@ -136,9 +141,9 @@ func test_chop() {
 }
 
 let test = [1, 2, 3, 4]
-chop_iter(value: 3, list: test, l: 0, r: test.count-1)
+chop_iter(value: -1, list: test, l: 0, r: test.count-1)
 // test.split().left.split()
 // test.asRangeCovers(value: 6)
 // let x = Array(test[0 ..< test.count/2])
 //chop(3, test)
-//test_chop()
+test_chop()
