@@ -143,4 +143,4 @@ class ParserTest: CHFParserDelegate {
 
 let test = ParserTest()
 
-test.process(url: "https://itunes.apple.com/us/rss/customerreviews/id=920189534/sortBy=mostRecent/xml") // 888422857
+test.process(url: "https://itunes.apple.com/us/rss/customerreviews/page=1/id=920189534/sortBy=mostRecent/xml") // 888422857
