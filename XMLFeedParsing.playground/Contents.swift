@@ -25,16 +25,16 @@ class XFPReview: CustomStringConvertible {
     var title: String?
     var author: String?
     var content: String?
-    var rating: Int?
+    var rating: Int = 0
     var version: String?
     
     var description: String {
-        return "REVIEW,\n \(title),\n \(content),\n \(author),\n \(rating)"
+        return "\n \(title),\n \(content),\n \(author),\n \(rating)/5"
     }
 }
 
 protocol CHFParserDelegate: class {
-    var feed: String { get set }
+    var allReviews: [XFPReview] { get set }
     func parsingDidEnd()
 }
 
@@ -43,6 +43,8 @@ class CHFParser: NSObject, XMLParserDelegate {
     private var currentContent: String = String()
     
     private var currentReview: XFPReview?
+    
+    private var isParsingContent: Bool = false
     
     weak var delegate: CHFParserDelegate?
     
@@ -75,8 +77,13 @@ class CHFParser: NSObject, XMLParserDelegate {
         self.currentContent = ""
 //        print("Begin: ", elementName, Array(attributeDict.keys))
         if elementName == "entry" {
-            print(self.currentReview ?? "NO REVIEW")
+//            print(self.currentReview ?? "NO REVIEW")
+            if self.currentReview != nil {
+                self.delegate?.allReviews.append(self.currentReview!)
+            }
             self.currentReview = XFPReview()
+        } else if elementName == "content" && attributeDict["type"] == "text" {
+            self.isParsingContent = true
         }
     }
     
@@ -91,30 +98,23 @@ class CHFParser: NSObject, XMLParserDelegate {
                 qualifiedName qName: String?) {
 //        print("End: ", elementName)
 
-        // If the current XML elements name is 'description' and it contains HTML content
-        // (There's got to be a better way to detect HTML right?...)
-        if self.currentContent.contains("<") && elementName == "content" {
-        
-            // Convert the entire HTML doc to an AttributedString and then back again to string to strip away all HTML.
-            self.currentContent = self.currentContent.unescape() + "\n"
-            delegate?.feed += self.currentContent
-
-//        }
-        } else if elementName == "title" {
-            delegate?.feed += self.currentContent + "\n"
+        if elementName == "title" {
             self.currentReview?.title = self.currentContent
         } else if elementName == "name" {
-            delegate?.feed += "NAME : " + self.currentContent + "\n"
             self.currentReview?.author = self.currentContent
         } else if elementName == "im:version" {
             self.currentReview?.version = self.currentContent
         } else if elementName == "im:rating" {
-            self.currentReview?.rating = Int(self.currentContent)
+            self.currentReview?.rating = Int(self.currentContent) ?? 0
+        } else if self.isParsingContent {
+            self.currentReview?.content = self.currentContent
+            self.isParsingContent = false
         }
     }
     
     func parserDidEndDocument(_ parser: XMLParser) {
-        print(self.currentReview ?? "NO REVIEW")
+//        print(self.currentReview ?? "NO REVIEW")
+        self.delegate?.allReviews.append(self.currentReview ?? XFPReview())
         self.delegate?.parsingDidEnd()
     }
     
@@ -122,8 +122,10 @@ class CHFParser: NSObject, XMLParserDelegate {
 
 class ParserTest: CHFParserDelegate {
     
+    var allReviews: [XFPReview] = []
+    
     internal func parsingDidEnd() {
-//        print(self.feed)
+        print(self.allReviews.dropFirst()) // [1 ..< self.allReviews.count]
     }
 
     internal var feed: String = ""
