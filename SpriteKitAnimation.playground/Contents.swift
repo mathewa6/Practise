@@ -2,16 +2,8 @@ import SpriteKit
 import PlaygroundSupport
 import UIKit
 
-class EMAnimationViewController: UIViewController {
-    private func createScene(withReferenceView view: UIView) -> SKScene {
-        let dimension: CGFloat = min(view.frame.width, view.frame.height)
-        let size: CGSize = CGSize(width: dimension, height: dimension)
-        
-        let scene: SKScene = SKScene(size: size)
-        scene.backgroundColor = .lightGray
-        
-        return scene
-    }
-}
+/// Adapted from https://www.swiftbysundell.com/posts/using-spritekit-to-create-animations-in-swift
 
-PlaygroundPage.current.liveView = EMAnimationViewController()
+let vc = EMAnimationViewController()
+vc.view.backgroundColor = .white
+PlaygroundPage.current.liveView = vc.view
