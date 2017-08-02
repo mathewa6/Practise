@@ -73,6 +73,18 @@ public extension UIView {
                               animations: animations,
                               mode: .parallel)
     }
+    
+    @discardableResult func animate(_ animations: Animation...) -> AnimationToken {
+        return AnimationToken(view: self,
+                              animations: animations,
+                              mode: .sequence)
+    }
+    
+    @discardableResult func animate(inParallel animations: Animation...) -> AnimationToken {
+        return AnimationToken(view: self,
+                              animations: animations,
+                              mode: .parallel)
+    }
 }
 
 internal extension UIView {
@@ -184,6 +196,10 @@ public func animate(_ tokens: [AnimationToken]) {
     }
 }
 
+public func animate(_ tokens: AnimationToken...) {
+    animate(tokens)
+}
+
 let debugFrame: CGRect = CGRect(x: 125.0,
                                 y: 125.0,
                                 width: 60.0,
@@ -201,16 +217,16 @@ secondView.center.x = debugView.center.x + 100
 
 view.addSubview(secondView)
 
-animate([
-    debugView.animate([
+animate(
+    debugView.animate(
         .fadeIn(duration: 2.5),
         .resize(to: CGSize(width: 250.0, height: 250.0),
                 duration: 2.5)
-        ]),
-    secondView.animate([
+        ),
+    secondView.animate(
         .move(byX: 100, y: 10, duration: 2.5)
-        ])
-    ])
+        )
+    )
 
 /*
 debugView.animate(inParallel: [
