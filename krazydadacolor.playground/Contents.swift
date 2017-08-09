@@ -146,6 +146,28 @@ extension UIColor {
         return UIColor(red: red, green: green, blue: blue, alpha: alpha)
         
     }
+    
+    public func lerpHSB(to color: UIColor, fraction: CGFloat) -> UIColor {
+        fraction
+        var frac: CGFloat = max(0, fraction)
+        frac = min(1, fraction)
+        
+        var h1: CGFloat = 0, s1: CGFloat = 0, b1: CGFloat = 0, a1: CGFloat = 0
+        self.getHue(&h1, saturation: &s1, brightness: &b1, alpha: &a1)
+        
+        var h2: CGFloat = 0, s2: CGFloat = 0, b2: CGFloat = 0, a2: CGFloat = 0
+        color.getHue(&h2, saturation: &s2, brightness: &b2, alpha: &a2)
+        
+        let hue: CGFloat = h1 + (h2 - h1) * frac
+        let saturation: CGFloat = s1 + (s2 - s1) * frac
+        let brightness: CGFloat = b1 + (b2 - b1) * frac
+        let alpha: CGFloat = a1 + (a2 - a1) * frac
+        
+        return UIColor(hue: hue,
+                       saturation: saturation,
+                       brightness: brightness,
+                       alpha: alpha)
+    }
 }
 
 UIColor.generateColorSequence(length: 20)
