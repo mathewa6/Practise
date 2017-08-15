@@ -62,7 +62,7 @@ public class GPXViewController: UIViewController, MKMapViewDelegate {
         
         
         let over = DXLPointsOverlay(withLocations: testCoordinates)
-        self.mapView.add(DBGTileOverlay())
+        // self.mapView.add(DBGTileOverlay())
         self.mapView.add(over)
 
     }
