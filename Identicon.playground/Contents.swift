@@ -11,6 +11,14 @@ public extension UIColor {
                        brightness: bri,
                        alpha: 1.0)
     }
+    
+    class var tintMuted: UIColor {
+        let factor: Float = 0.66
+        return UIColor.init(colorLiteralRed: ((12/255.0) + factor)/2,
+                            green: ((150/255.0) + factor)/2,
+                            blue: ((75/255.0) + factor)/2,
+                            alpha: 1.0)
+    }
 }
 
 public extension CGColor {
@@ -30,7 +38,7 @@ public class GitHubIdenticon {
     private let numberOfRows = 5
     private let numberOfRowComponents = 5
     
-    public let size: CGSize = CGSize(width: 88, height: 88)
+    public let size: CGSize = CGSize(width: 600, height: 600)
     
     public init() {}
     
@@ -46,15 +54,15 @@ public class GitHubIdenticon {
             )!
         context.setShouldAntialias(false)
         
-        let color = UIColor.randomNormalizedColor().cgColor
-        context.setFillColor(color)
+        var color = UIColor.tintMuted.cgColor
         
         let cellSize = CGSize(width: size.width / CGFloat(rows), height: size.height / CGFloat(columns));
         
         for row in 0..<rows {
             for col in 0..<columns - columns/2 {
                 let offset = Int(row * columns + col)
-                if ((value >> offset) & 0b1) == 0 {
+                let digit: Int = (value >> offset)
+                if (digit & 0b1) == 0 {
                     continue
                 }
                 
@@ -64,6 +72,9 @@ public class GitHubIdenticon {
                     }
                 }
                 
+                color = color.copy(alpha: CGFloat(0.51 + Double((digit & 0b1111))/16.0)) ?? color
+                context.setFillColor(color)
+
                 var rects = [CGRect]()
                 rects.append(self.rect(forRow: row, column: col, size: cellSize))
                 
@@ -161,7 +172,7 @@ public class GitHubIdenticon {
     }
 }
 
-let str = "E1BF043B"
+let str = "211627EF"
 let num = Int(exactly: str.hash)!
 
 for char in str.characters {
@@ -176,12 +187,34 @@ truths
 
 let x = GitHubIdenticon()
 UIImage(cgImage: x.icon(from: num, size: CGSize(width: 44, height: 44)))
-UIImage(cgImage: x.identity(using: num, withRows: 5, columns: 5))
+let image = UIImage(cgImage: x.identity(using: "D441DDE7-27D5-471F-B426-A2A745D400F0".hash, withRows: 5, columns: 5))
+
+
+// Create path.
+let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+let filePath = "\(paths[0])/Identicon.png"
+
+let url: URL = URL(fileURLWithPath: filePath)
+print(url.description)
+
+let
+imageView: UIImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 600, height: 600))
+imageView.layer.cornerRadius = 7.5
+imageView.backgroundColor = UIColor(colorLiteralRed: 235/250, green: 235/250, blue: 235/250, alpha: 1.0)
+imageView.image = image
+
+// Save image.
+do {
+    try UIImagePNGRepresentation(image)?.write(to: url)
+} catch let error as NSError {
+    print("Error")
+}
+
 
 x.generated()
 
 class IdentityView: UIView {
-    public let text: String = "AZBF043BE1B"
+    public let text: String = "211627EF"
     
     override func draw(_ rect: CGRect) {
         guard let g: CGContext = UIGraphicsGetCurrentContext() else {
