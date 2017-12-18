@@ -13,8 +13,8 @@ extension String {
     
     func unescape() -> String {
         let data = try! NSAttributedString(data: self.data(using: String.Encoding.unicode)!,
-                                           options: [NSDocumentTypeDocumentAttribute:
-                                            NSHTMLTextDocumentType],
+                                           options: [.documentType: NSAttributedString.DocumentType.html,
+                                                     .characterEncoding: String.Encoding.utf8.rawValue],
                                            documentAttributes: nil)
         return data.string
         
