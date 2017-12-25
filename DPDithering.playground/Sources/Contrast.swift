@@ -59,38 +59,57 @@ public struct RGBA: CustomStringConvertible {
     public var width: Int
     public var height: Int
     
+    private func createContext(withWidth width: Int,
+                               height: Int,
+                               data: UnsafeMutablePointer<Pixel>) -> CGContext? {
+        let bitsPerComponent = 8
+        let bytesPerPixel = 4
+        let bytesPerRow = width * bytesPerPixel
+        
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        
+        var bitMapInfo: UInt32 = CGBitmapInfo.byteOrder32Big.rawValue
+        bitMapInfo |= CGImageAlphaInfo.premultipliedLast.rawValue & CGBitmapInfo.alphaInfoMask.rawValue
+        
+        guard let imageContext = CGContext(data: data,
+                                           width: width,
+                                           height: height,
+                                           bitsPerComponent: bitsPerComponent,
+                                           bytesPerRow: bytesPerRow,
+                                           space: colorSpace,
+                                           bitmapInfo: bitMapInfo) else { return nil }
+        
+        return imageContext
+    }
+    
     public init?(image: UIImage) {
         guard let cgImage = image.cgImage else { return nil }
         
-        width = Int(image.size.width)
-        height = Int(image.size.height)
-        
-        let bitsPerComponent = 8
-        let bytesPerPixel = 4
-        let bytesPerRow = width * bytesPerPixel
+        self.width = Int(image.size.width)
+        self.height = Int(image.size.height)
+
         let imageData = UnsafeMutablePointer<Pixel>.allocate(capacity: width * height)
+        self.pixels = UnsafeMutableBufferPointer<Pixel>(start: imageData, count: width * height)
+
+        guard let imageContext: CGContext = self.createContext(withWidth: self.width,
+                                                               height: self.height,
+                                                               data:imageData) else { return nil }
         
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        
-        var bitMapInfo: UInt32 = CGBitmapInfo.byteOrder32Big.rawValue
-        bitMapInfo |= CGImageAlphaInfo.premultipliedLast.rawValue & CGBitmapInfo.alphaInfoMask.rawValue
-        guard let imageContext = CGContext(data: imageData, width: width, height: height, bitsPerComponent: bitsPerComponent, bytesPerRow: bytesPerRow, space: colorSpace, bitmapInfo: bitMapInfo) else { return nil }
         imageContext.draw(cgImage, in: CGRect(origin: CGPoint.zero, size: image.size))
         
-        pixels = UnsafeMutableBufferPointer<Pixel>(start: imageData, count: width * height)
     }
     
     public func toImage() -> UIImage? {
-        let bitsPerComponent = 8
-        let bytesPerPixel = 4
-        let bytesPerRow = width * bytesPerPixel
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        guard let imageData: UnsafeMutablePointer<Pixel> = self.pixels.baseAddress else {
+            return nil
+        }
         
-        var bitMapInfo: UInt32 = CGBitmapInfo.byteOrder32Big.rawValue
-        bitMapInfo |= CGImageAlphaInfo.premultipliedLast.rawValue & CGBitmapInfo.alphaInfoMask.rawValue
+        guard let imageContext = self.createContext(withWidth: self.width,
+                                                    height: self.height,
+                                                    data: imageData) else { return nil }
         
-        guard let imageContext = CGContext(data: pixels.baseAddress, width: width, height: height, bitsPerComponent: bitsPerComponent, bytesPerRow: bytesPerRow, space: colorSpace, bitmapInfo: bitMapInfo, releaseCallback: nil, releaseInfo: nil) else { return nil }
         guard let cgImage = imageContext.makeImage() else { return nil }
+        
         let image = UIImage(cgImage: cgImage)
         
         return image
