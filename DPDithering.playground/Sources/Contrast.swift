@@ -1,173 +1,53 @@
 import Foundation
-import UIKit
 
-public struct Coordinate: CustomStringConvertible {
-    var x: Int
-    var y: Int
-    
-    public var description: String {
-        return "(\(x), \(y))"
-    }
-}
-
-public struct Pixel: CustomStringConvertible {
-    public var value: UInt32
-    
-    public var red: UInt8 {
-        get {
-            return UInt8(value & 0xFF)
-        }
-        set {
-            value = UInt32(newValue) | (value & 0xFFFFFF00)
-        }
-    }
-    
-    public var green: UInt8 {
-        get {
-            return UInt8(value >> 8 & 0xFF)
-        }
-        set {
-            value = (UInt32(newValue) << 8) | (value & 0xFFFF00FF)
-        }
-    }
-    
-    public var blue: UInt8 {
-        get {
-            return UInt8(value >> 16 & 0xFF)
-        }
-        set {
-            value = (UInt32(newValue) << 16) | (value & 0xFF00FFFF)
-        }
-    }
-    
-    public var alpha: UInt8 {
-        get {
-            return UInt8(value >> 24 & 0xFF)
-        }
-        set {
-            value = (UInt32(newValue) << 24) | (value & 0x00FFFFFF)
-        }
-    }
-    
-    public var description: String {
-        return "Pixel : \(value)"
-    }
-}
-
-public struct RGBA: CustomStringConvertible {
-    public var pixels: UnsafeMutableBufferPointer<Pixel>
-    public var width: Int
-    public var height: Int
-    
-    private func createContext(withWidth width: Int,
-                               height: Int,
-                               data: UnsafeMutablePointer<Pixel>) -> CGContext? {
-        let bitsPerComponent = 8
-        let bytesPerPixel = 4
-        let bytesPerRow = width * bytesPerPixel
+extension RGBA {
+    /// Returns Int tuple (R, G, B)
+    public var averageColors: (Int, Int, Int) {
+        var totalRed = 0, totalGreen = 0, totalBlue = 0
         
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        
-        var bitMapInfo: UInt32 = CGBitmapInfo.byteOrder32Big.rawValue
-        bitMapInfo |= CGImageAlphaInfo.premultipliedLast.rawValue & CGBitmapInfo.alphaInfoMask.rawValue
-        
-        guard let imageContext = CGContext(data: data,
-                                           width: width,
-                                           height: height,
-                                           bitsPerComponent: bitsPerComponent,
-                                           bytesPerRow: bytesPerRow,
-                                           space: colorSpace,
-                                           bitmapInfo: bitMapInfo) else { return nil }
-        
-        return imageContext
-    }
-    
-    public init?(image: UIImage) {
-        guard let cgImage = image.cgImage else { return nil }
-        
-        self.width = Int(image.size.width)
-        self.height = Int(image.size.height)
-
-        let imageData = UnsafeMutablePointer<Pixel>.allocate(capacity: width * height)
-        self.pixels = UnsafeMutableBufferPointer<Pixel>(start: imageData, count: width * height)
-
-        guard let imageContext: CGContext = self.createContext(withWidth: self.width,
-                                                               height: self.height,
-                                                               data:imageData) else { return nil }
-        
-        imageContext.draw(cgImage, in: CGRect(origin: CGPoint.zero, size: image.size))
-        
-    }
-    
-    public func toImage() -> UIImage? {
-        guard let imageData: UnsafeMutablePointer<Pixel> = self.pixels.baseAddress else {
-            return nil
+        for y in 0..<self.height {
+            for x in 0..<self.width {
+                
+                let pixel = self[x, y]
+                totalRed += Int(pixel.red)
+                totalGreen += Int(pixel.green)
+                totalBlue += Int(pixel.blue)
+            }
         }
         
-        guard let imageContext = self.createContext(withWidth: self.width,
-                                                    height: self.height,
-                                                    data: imageData) else { return nil }
+        let totalPixels = self.pixels.count //rgba.width * rgba.height
         
-        guard let cgImage = imageContext.makeImage() else { return nil }
-        
-        let image = UIImage(cgImage: cgImage)
-        
-        return image
-        
+        return (totalRed/totalPixels, totalGreen/totalPixels, totalBlue/totalPixels)
     }
-    
-    public var description: String {
-        return "(\(width), \(height)), \(width*height)"
-    }
-}
-
-public func findIndex(_ coordinate: Coordinate, rgba: RGBA) -> Int {
-    return coordinate.y * rgba.width + coordinate.x
-}
-
-public func findAverageColors(_ rgba: RGBA) -> (Int, Int, Int) {
-    var totalRed = 0, totalGreen = 0, totalBlue = 0
-    
-    for y in 0..<rgba.height {
-        for x in 0..<rgba.width {
-            let index = y * rgba.width + x
-            let pixel = rgba.pixels[index]
-            totalRed += Int(pixel.red)
-            totalGreen += Int(pixel.green)
-            totalBlue += Int(pixel.blue)
-        }
-    }
-    
-    let totalPixels = rgba.pixels.count //rgba.width * rgba.height
-    
-    return (totalRed/totalPixels, totalGreen/totalPixels, totalBlue/totalPixels)
 }
 
 public func contrast(_ rgba: RGBA) -> RGBA {
-    let averages = findAverageColors(rgba)
+    var contrastRGBA: RGBA = rgba
     
-    for y in 0..<rgba.height {
-        for x in 0..<rgba.width {
-            let index = y * rgba.width + x
-            var pixel = rgba.pixels[index]
+    let averages = contrastRGBA.averageColors
+    
+    for y in 0..<contrastRGBA.height {
+        for x in 0..<contrastRGBA.width {
+            var pixel = contrastRGBA[x, y]
             let redDelta = Int(pixel.red) - averages.0
             let greenDelta = Int(pixel.green) - averages.1
             let blueDelta = Int(pixel.blue) - averages.2
             pixel.red = UInt8(max(min(255, averages.0 + 3 * redDelta), 0))
             pixel.green = UInt8(max(min(255, averages.1 + 3 * greenDelta), 0))
             pixel.blue = UInt8(max(min(255, averages.2 + 3 * blueDelta), 0))
-            rgba.pixels[index] = pixel
+            contrastRGBA[x, y] = pixel
         }
     }
     
-    return rgba
+    return contrastRGBA
 }
 
 public func grayscale(_ rgba: RGBA) -> RGBA {
-    for y in 0..<rgba.height {
-        for x in 0..<rgba.width {
-            let index = y * rgba.width + x
-            var pixel = rgba.pixels[index]
+    var grayRGBA: RGBA = rgba
+    
+    for y in 0..<grayRGBA.height {
+        for x in 0..<grayRGBA.width {
+            var pixel = grayRGBA[x, y]
             
             let grayscale = (Int(pixel.red) + Int(pixel.green) + Int(pixel.blue))/3
             
@@ -175,21 +55,21 @@ public func grayscale(_ rgba: RGBA) -> RGBA {
             pixel.green = UInt8(grayscale)
             pixel.blue = UInt8(grayscale)
             
-            rgba.pixels[index] = pixel
+            grayRGBA[x, y] = pixel
         }
     }
     
-    return rgba
+    return grayRGBA
 
 }
 
 public func ditherSimple(_ rgba: RGBA) -> RGBA {
+    var ditheredRGBA: RGBA = rgba
     var previousError = 0
     
-    for y in 0..<rgba.height {
-        for x in 0..<rgba.width {
-            let index = y * rgba.width + x
-            var pixel = rgba.pixels[index]
+    for y in 0..<ditheredRGBA.height {
+        for x in 0..<ditheredRGBA.width {
+            var pixel = rgba[x, y]
             
             //Calculate the grayscale by R+G+B/3 for each pixel
             var grayscale = (Int(pixel.red) + Int(pixel.green) + Int(pixel.blue))/3
@@ -210,9 +90,9 @@ public func ditherSimple(_ rgba: RGBA) -> RGBA {
             pixel.green = UInt8(diffusedPixel)
             pixel.blue = UInt8(diffusedPixel)
             
-            rgba.pixels[index] = pixel
+            ditheredRGBA[x, y] = pixel
         }
     }
     
-    return rgba
+    return ditheredRGBA
 }
